@@ -68,14 +68,15 @@ def paradaOtimo(linhaZc):
 #####
 """
 Funcao: printTabela
-Entrada: iteracao,problema na forma matricial
+Entrada: problema na forma matricial
 Saida:
-Descricao: printa a tabela da iteracao
+Descricao: printa a tabela
 """
-def printTabela(iteracao,problema):
-    print("Tabela da iteracao ",iteracao,":");
-    for i in problema:
-        print(i);
+def printTabela(problema):
+    print("Tabela:");
+    for linha in problema:
+        for elemento in linha:
+            print(int(elemento*1000)/1000.0);
     print();
 #####
 
@@ -143,29 +144,43 @@ def verificaDegeneracao(problema,vb):
     coluna_dosCustos=len(problema[0])-1
     for i in range(1,len(problema)):
         if(problema[i][coluna_dosCustos] == 0): return 'Degenerada'
-    return 'Unica'
+    return 'Simples'
 
 
 #####
+
+#####
+def verificaBase(x,problema):
+    flag=True;
+    for i in range(0,len(problema)):
+        if(problema[i][x]==1):
+            if(flag): flag=False
+            else: return False;
+        elif(problema[i][x]!=0):return False;
+    return True;
+#####
+
+
 """
 Funcao: simplex
 Entrada: matriz com o problema
 Saida: imprime as tabelas e a solucao caso possivel
 """
 def simplex(matriz,debug):
-    iteracoes=0;
     coordenadas=matriz[0]
     problema=matriz[1]
 
-    variaveis_naoBasicas=[x for x in range(0,int(coordenadas[1]-coordenadas[0]))]
-    variaveis_Basicas=[x for x in range(int(coordenadas[1]-coordenadas[0]),int(coordenadas[1]-1))]
+    for i in range(0,len(problema[0])):
+        if(problema[0][i] != 0):
+            problema[0][i]=-1*(problema[0][i])
+
+    variaveis_naoBasicas=[x for x in range(0,int(coordenadas[1])-1) if not(verificaBase(x,problema))]
+    variaveis_Basicas=[x for x in range(0, int(coordenadas[1])-1) if verificaBase(x,problema)]
     ## Base inicial = variaveis de folga
 
 
     while(not(paradaOtimo(problema[0]))):
-
-        iteracoes=iteracoes+1
-        printTabela(iteracoes,problema)
+        printTabela(problema)
 
         if(verificaDivergencia(problema,variaveis_naoBasicas)):
            print('Solucao diverge');
@@ -177,9 +192,9 @@ def simplex(matriz,debug):
             print('variaveis nao basicas: ',variaveis_naoBasicas);
             print('variaveis basicas: ',variaveis_Basicas);
         ###
-        if(debug): print('Candidato da iteracao ',iteracoes,': ',candidato);
+        if(debug): print('Candidato: ',candidato);
         saindo=minimoBase(candidato,variaveis_Basicas,problema)
-        if(debug): print('Saindo na iteracao ',iteracoes,': ',saindo);
+        if(debug): print('Saindo: ',saindo);
         variavelSaindo=saindo[1]
         saindo=saindo[0]
         variaveis_naoBasicas.remove(candidato)
@@ -189,7 +204,7 @@ def simplex(matriz,debug):
 
         pivoteamento(problema,saindo,candidato)
 
-    printTabela(iteracoes+1,problema)
+    printTabela(problema)
     printResultado2(problema)
     print('Solucao ',verificaDegeneracao(problema,variaveis_Basicas),' ',verificaMultiplicidade(problema,variaveis_Basicas));
 
@@ -205,9 +220,9 @@ def printResultado(problema,vb):
         resultado[i]=problema[linha_atual][coluna_dosCustos]
         linha_atual=linha_atual+1
 
-    print('Custo= ',CustoZ);
+    print('Custo= ',int(CustoZ*1000)/1000.0);
     for i in range(0,len(resultado)):
-        print('x',i,': ',resultado[i],'; ')
+        print('x',i,': ',int(resultado[i]*1000)/1000.0,'; ')
     print();
 
 def printResultado2(problema):
@@ -219,24 +234,18 @@ def printResultado2(problema):
         else:
             for j in range(1,len(problema)):
                 if(problema[j][i] != 0):
-                    x.append(str(problema[j][len(custos)-1]))
-    print 'Custo = ',custos[-1]
+                    x.append(str(int(problema[j][len(custos)-1]*1000)/1000.0))
+    print 'Custo = ',int(custos[-1]*1000)/1000.0
     print "x = (",', '.join(x),")"
 
 
 def verificaMultiplicidade(problema,vnb):
     for i in vnb:
         if(problema[0][i]==0):return 'Multipla'
-    return 'Simples'
+    return 'Unica'
 
 #####
-def main():
+def _main():
     matriz=geraMatriz(leArquivo(sys.argv))
-    for i in range(0,len(matriz[1][0])):
-        if(matriz[1][0][i] != 0):
-            matriz[1][0][i]=-1*(matriz[1][0][i])
-    print matriz
     simplex(matriz,False)
 #####
-
-main()
