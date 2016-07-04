@@ -56,10 +56,10 @@ def maximoZ(linha,vnb):
 #####
 """
 Funcao: paradaOtimo
-Entrada: linha dos Z-C
-Saida: Verdadeiros se todos forem menores  ou iguais a 0, Falso senao
+Entrada: coluna dos b's
+Saida: Verdadeiros se todos forem maiores  ou iguais a 0, Falso senao
 """
-def paradaOtimo(linhaZc):
+def paradaOtimo(colunaB):
     for i in linhaZc:
         if(i>0):
             return False

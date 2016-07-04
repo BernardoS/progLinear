@@ -60,9 +60,6 @@ def simplexFirstPhase(matriz,debug):
         saindo[0] = saindo[0] +1
         variavelSaindo=saindo[1]
         saindo=saindo[0]
-        print saindo
-        print variavelSaindo
-        print candidato
         naoBasicas.remove(candidato)
         naoBasicas.append(variavelSaindo)
         basicas.remove(variavelSaindo)
